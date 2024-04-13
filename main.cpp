@@ -1,27 +1,16 @@
-#include <iostream>
-#include <string>
-using namespace std;
+#include "includes.h"
 
-class CLI {
-    private:
-        string input;
-
-    public:
-        void printName()
-        {
-            cout << "This is a test." << endl;
-        }
-};
-
+//int main(int ac, char **av)
 int main()
 {
     string interface;
+    // (void)ac;
+    // (void)av;
 
     while (1)
     {
-        cout << "What interface would you like to use?\nType 1 for CLI and 2 for GUI: ";
+        cout << "\nWhat interface would you like to use?\nType 1 for CLI and 2 for GUI: ";
         getline(cin, interface);
-        cout << "\n" << endl;
 
         if (interface.length() == 1)
         {
@@ -33,7 +22,7 @@ int main()
     // EXITING PROGRAM CODE
     if (interface[0] == '0')
     {
-        cout << "Exiting program..\n" << endl;
+        cout << "\nExiting program..\n" << endl;
         return (0);
     }
 
@@ -49,7 +38,11 @@ int main()
             
             if (input.substr(0, 10) == "fetch duhr" && input.length() == 10)
             {
-                cout << "working" << endl;
+                cout << "Calling class: CLI" << endl;
+
+                CLI duhr;
+
+                duhr.printMsg();
             }
             else if ((input.substr(0, 4) == "quit" && input.length() == 4) || (input[0] == '0' && input.length() == 1) || (input[0] == 'q' && input.length() == 1))
             {
