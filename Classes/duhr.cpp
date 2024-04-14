@@ -1,6 +1,6 @@
 #include "../includes.h"
 
-void CLI::printMsg()
+void duhr::callTime()
 {
     cout << "This is a test." << endl;
 }

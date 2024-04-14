@@ -3,13 +3,14 @@
 
 #include <iostream>
 #include <string>
+#include <ctime>
 using namespace std;
 
-class CLI {
+class duhr {
     private:
         string input;
     public:
-        void printMsg();
+        void callTime();
 };
 
 #endif
