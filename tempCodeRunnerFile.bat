@@ -1,0 +1,1 @@
+g++ .\main.o .\Classes\duhr.o -o .\main.exe

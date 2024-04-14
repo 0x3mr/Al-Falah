@@ -3,31 +3,31 @@
 //int main(int ac, char **av)
 int main()
 {
-    string interface;
+    string interfacer;
     // (void)ac;
     // (void)av;
 
     while (1)
     {
         cout << "\nWhat interface would you like to use?\nType [1] for CLI [2] for GUI [0] to exit: ";
-        getline(cin, interface);
+        getline(cin, interfacer);
 
-        if (interface.length() == 1)
+        if (interfacer.length() == 1)
         {
-            if (interface[0] == '0' || interface[0] == '1' || interface[0] == '2')
+            if (interfacer[0] == '0' || interfacer[0] == '1' || interfacer[0] == '2')
                 break;
         }
     }
 
     // EXITING PROGRAM CODE
-    if (interface[0] == '0')
+    if (interfacer[0] == '0')
     {
         cout << "\nExiting program..\n" << endl;
         return (0);
     }
 
     // CLI CODE
-    if (interface[0] == '1')
+    if (interfacer[0] == '1')
     {
         string input;
 
@@ -57,7 +57,7 @@ int main()
     }
 
     // GUI CODE
-    if (interface[0] == '2')
+    if (interfacer[0] == '2')
     {
         // Enter GUI mode.
         cout << "\n *** NOT OPERATIONAL AT THE MOMENT *** \n" << endl;
