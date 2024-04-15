@@ -16,6 +16,7 @@ using namespace std;
 //         void callTime();
 // };
 
+constexpr DWORD bufferSize = 1024;
 constexpr const char* const DATA_FILE = "data.txt";
 constexpr const char* const LINKED_WEBSITE = "https://salah.com";
 

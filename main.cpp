@@ -3,37 +3,40 @@
 void scrapWebsite()
 {
     // Open the file to write the website contents
-    std::ofstream outfile("data.txt");
+    ofstream outfile("data.txt");
 
     // Check if the file is opened successfully
-    if (!outfile.is_open()) {
-        std::cerr << "Error opening file for writing." << std::endl;
+    if (!outfile.is_open())
+    {
+        cerr << "Error opening file for writing." << endl;
         return;
     }
 
     // Website URL
-    std::string url = "https://salah.com/";
+    string url = "https://salah.com/";
 
     // Initialize WinINet
     HINTERNET hInternet = InternetOpenA("WinINet", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
-    if (hInternet == NULL) {
-        std::cerr << "Failed to initialize WinINet." << std::endl;
+    if (hInternet == NULL)
+    {
+        cerr << "Failed to initialize WinINet." << endl;
         return;
     }
 
     // Open the URL
     HINTERNET hUrl = InternetOpenUrlA(hInternet, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
-    if (hUrl == NULL) {
-        std::cerr << "Error opening URL: " << url << std::endl;
+    if (hUrl == NULL)
+    {
+        cerr << "Error opening URL: " << url << endl;
         InternetCloseHandle(hInternet);
         return;
     }
 
     // Read from the website and write to the file
-    constexpr DWORD bufferSize = 1024;
     char buffer[bufferSize];
     DWORD bytesRead;
-    while (InternetReadFile(hUrl, buffer, bufferSize, &bytesRead) && bytesRead > 0) {
+    while (InternetReadFile(hUrl, buffer, bufferSize, &bytesRead) && bytesRead > 0)
+    {
         outfile.write(buffer, bytesRead);
     }
 
@@ -44,7 +47,7 @@ void scrapWebsite()
     // Close the file stream
     outfile.close();
 
-    std::cout << "Website contents have been saved to data.txt" << std::endl;
+    cout << "Website contents have been saved to data.txt" << endl;
 }
 
 class fajr {

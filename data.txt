@@ -22,16 +22,16 @@
   <dl id="times">
                           <dt>Fajr</dt>
           <dd id="Fajr">
-            <span>4:01</span>AM          </dd>
+            <span>3:57</span>AM          </dd>
                                     <dt class="sp">Sunrise</dt>
           <dd id="Sunrise" class="sp">
-            <span>5:31</span>AM          </dd>
+            <span>5:28</span>AM          </dd>
                                     <dt>Dhuhr</dt>
           <dd id="Dhuhr">
-            <span>11:56</span>AM          </dd>
+            <span>11:55</span>AM          </dd>
                                     <dt>Asr</dt>
           <dd id="Asr">
-            <span>3:30</span>PM          </dd>
+            <span>3:29</span>PM          </dd>
                                     <dt>Maghrib</dt>
           <dd id="Maghrib">
             <span>6:22</span>PM          </dd>
@@ -40,10 +40,10 @@
             <span>7:42</span>PM          </dd>
                                     <dt class="sp">Qiyam</dt>
           <dd id="Qiyam" class="sp">
-            <span>1:15</span>AM          </dd>
+            <span>1:12</span>AM          </dd>
                   </dl>
 
-<h2><img src="/img/geo.svg"/><span>Al Fayyum, FYM</span></h2>
+<h2><img src="/img/geo.svg"/><span>Giza, GZ</span></h2>
   <h4><span>Method</span> Egyptian General Authority</h4>
   <div id="footer">Copyright &copy; 2024 Salah.com. All rights reserved.</div>
 </div>
