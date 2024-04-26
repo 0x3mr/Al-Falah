@@ -10,14 +10,16 @@
 
 using namespace std;
 
-// class duhr {
-//     public:
-//         void webScrapper();
-//         void callTime();
-// };
+extern int bufferSize;
+extern int salahFajr;
+extern int salahSunrise;
+extern int salahDuhr;
+extern int salahAsr;
+extern int salahMaghrib;
+extern int salahIsha;
+extern string url;
 
-constexpr DWORD bufferSize = 1024;
-constexpr const char* const DATA_FILE = "data.txt";
-constexpr const char* const LINKED_WEBSITE = "https://salah.com";
+void extractTime(int Salah);
+void scrapWebsite();
 
 #endif

@@ -4,5 +4,9 @@
 @REM del .\main.o
 @REM del .\Classes\duhr.o
 @REM .\main
-g++ main.cpp -o main -lwininet
-.\main.exe
+
+@REM g++ main.cpp -o main -lwininet
+
+set SCRIPT_DIR=%~dp0
+cd "%SCRIPT_DIR%"
+g++ -o main main.cpp Functions/*.cpp -IFunctions -lwininet && main.exe
