@@ -1,0 +1,12 @@
+#!/bin/bash
+
+i=0 
+while true; do 
+    case $1 in 
+      0) echo -n "/";;
+      1) echo -n "|";;
+      2) echo -n "\\";;
+    esac 
+    i=$(( (i+1) %3))
+    sleep 0.1
+    echo -n "\r"

@@ -3,6 +3,13 @@
         "iostream": "cpp",
         "ostream": "cpp",
         "cctype": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "string": "cpp",
+        "*.tcc": "cpp",
+        "deque": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "system_error": "cpp",
+        "new": "cpp"
     }
 }

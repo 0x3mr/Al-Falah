@@ -7,6 +7,9 @@
 #include <Windows.h>
 #include <WinINet.h>
 #include <cctype>
+#include <cstdlib>
+#include <algorithm>
+
 
 using namespace std;
 
@@ -21,5 +24,8 @@ extern string url;
 
 void extractTime(int Salah);
 void scrapWebsite();
+void clear();
+void error(string errorType);
+void welcome(string message);
 
 #endif
