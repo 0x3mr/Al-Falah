@@ -62,7 +62,8 @@ public:
                 }
                 else
                 {
-                    cout << "Invalid password for user: " << username << endl;
+                    //cout << "Invalid password for user: " << username << endl;
+                    error("invalidPassword");
                     file.close();
                     return false;
                 }
@@ -70,7 +71,8 @@ public:
         }
 
         if (!userFound) {
-            cout << "User " << username << " does not exist." << endl;
+            //cout << "User " << username << " does not exist." << endl;
+            error("invalidUser");
         }
 
         file.close();
@@ -97,7 +99,8 @@ public:
         file.close();
 
         if (userExists) {
-            cout << "User " << username << " already exists. Cannot register." << endl;
+            //cout << "User " << username << " already exists. Cannot register." << endl;
+            error("existingUser");
         } else {
             ofstream file("loginData.txt", ios::app);
             file << username << "*" << password << endl;
@@ -122,8 +125,8 @@ public:
 
             if (usernameFromFile == username)
             {
-                cout << "Account Found!" << endl;
-                cout << "Your Password: " << passwordFromFile << endl;
+                cout << "   [+] Account Found!" << endl;
+                cout << "   [!] Your Password: " << passwordFromFile << endl;
                 break;
             }
         }
@@ -241,6 +244,21 @@ int main()
             {
                 cout << "SECOND REGISTER OPTION" << endl;
             }
+            else if (input.substr(0, 6) == "logout" && input.length() == 6)
+            {
+                if (loggedin == "yes")
+                {
+                    cout << "Logged out successfully!" << endl;
+                    prefix = "";
+                    loggedin = "no";
+                    clear();
+                    welcome("startup");
+                }
+                else
+                {
+                    cout << "You're not logged in!" << endl;
+                }
+            }
             
             if (loggedin == "yes")
             {
@@ -281,6 +299,7 @@ int main()
                     error("signedOut");
             }
             
+            if (input.length() <= 4) { input = decapitalize(input); }
             if ((input.substr(0, 4) == "quit" && input.length() == 4) || (input[0] == '0' && input.length() == 1) || (input[0] == 'q' && input.length() == 1))
             {
                 cout << "Exiting CLI mode." << endl;

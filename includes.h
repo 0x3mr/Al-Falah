@@ -27,5 +27,6 @@ void scrapWebsite();
 void clear();
 void error(string errorType);
 void welcome(string message);
+string decapitalize(string input);
 
 #endif
