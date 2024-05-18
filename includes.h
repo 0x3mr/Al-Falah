@@ -24,8 +24,6 @@ extern int salahMaghrib;
 extern int salahIsha;
 extern string url;
 
-void extractTime(int Salah);
-void scrapWebsite();
 void clear();
 void error(string errorType);
 void welcome(string message);
