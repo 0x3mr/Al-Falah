@@ -18,16 +18,21 @@ class User
 {
     protected:
         string username, password;
+        int points, level;
     public:
-        User(const string &username, const string &password) : username(username), password(password) {}
+        User(const string &username, const string &password) : username(username), password(password), points(0), level(0) {}
 
         virtual ~User() {}
 
         string getusername() const { return username; }
         string getPassword() const { return password; }
+        int getPoints() const { return points; }
+        int getLevel() const { return level; }
 
         void setusername(const string &username) { this->username = username; }
         void setPassword(const string &password) { this->password = password; }
+        void setPoints(const int &points) { this->points = points; }
+        void setLevel(const int &level) { this->level = level; }
 };
 
 class RegisteredUser : public User {
@@ -70,7 +75,8 @@ public:
             }
         }
 
-        if (!userFound) {
+        if (userFound == false)
+        {
             //cout << "User " << username << " does not exist." << endl;
             error("invalidUser");
         }
@@ -165,13 +171,11 @@ int main()
     if (mode[0] == '1')
     {
         string input;
-        string username, password;
+        string username = "-", password = "-";
         string prefix = "";
         string loggedin = "no";
 
         RegisteredUser* user = nullptr;
-
-        cout << "\n";
 
         // scrapWebsite();
         // Add it back if user logins in only
@@ -181,54 +185,101 @@ int main()
 
         while (1)
         {
+            input = "";
             cout << prefix << " $ ";
             getline(cin, input);
             
-            if (input.substr(0, 5) == "login" && input.length() == 5)
+            if (input.substr(0, 5) == "login")
             {
-                welcome("login");
-                do {
-                    cout << "    * Enter username: ";
-                    getline(cin, username);
-
-                    cout << "    * Enter password: ";
-                    getline(cin, password);
-
-                    if (username.find(' ') != string::npos || password.find(' ') != string::npos) { error("space"); }
-                } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
-
-                // if successful login
-                user = new RegisteredUser(username, password);
-                if (user->login(username, password))
+                if (input.substr(0, 5) == "login" && input.length() == 5)
                 {
-                    cout << "\n";
-                    prefix = username;
-                    loggedin = "yes";
-                    clear();
-                    welcome("successfulLogin");
+                    welcome("login");
+                    do
+                    {
+                        cout << "    * Enter username: ";
+                        getline(cin, username);
+
+                        cout << "    * Enter password: ";
+                        getline(cin, password);
+
+                        if (username.find(' ') != string::npos || password.find(' ') != string::npos)
+                        {
+                            error("space");
+                        }
+                    } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
                 }
-                else
+
+                if (input.substr(0, 6) == "login " && count(input.begin(), input.end(), ' ') == 2 && input.find("  ") == std::string::npos)
                 {
-                    error("invalidLogin");
+                    size_t space_pos;
+                    string temp_username, temp_password;
+                    
+                    space_pos = input.find(' ');
+                    temp_username = input.substr(space_pos + 1);
+                    space_pos = temp_username.find(' ');
+                    
+                    temp_password = temp_username.substr(space_pos + 1);
+                    temp_username.erase(space_pos);
+
+                    username = temp_username;
+                    password = temp_password;
                 }
-                delete user;
-            }
-            else if (input.substr(0, 6) == "login " && count(input.begin(), input.end(), ' ') == 2)
-            {
-                cout << "SECOND LOGIN OPTION" << endl;
-            }
-            else if (input.substr(0, 8) == "register" && input.length() == 8)
-            {
-                welcome("register");
-                do {
-                    cout << "    * Enter username: ";
-                    getline(cin, username);
 
-                    cout << "    * Enter password: ";
-                    getline(cin, password);
+                if (username != "-" && username != "-")
+                {
+                    user = new RegisteredUser(username, password);
+                    // if successful login
+                    if (user->login(username, password))
+                    {
+                        cout << "\n";
+                        prefix = username;
+                        loggedin = "yes";
+                        clear();
+                        welcome("successfulLogin");
+                    }
+                    else
+                    {
+                        error("invalidLogin");
+                    }
+                    delete user;
+                }
+            }
 
-                    if (username.find(' ') != string::npos || password.find(' ') != string::npos) { error("space"); }
-                } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
+            if (input.substr(0, 8) == "register")
+            {           
+                if (input.substr(0, 8) == "register" && input.length() == 8)
+                {
+                    welcome("register");
+                    do
+                    {
+                        cout << "    * Enter username: ";
+                        getline(cin, username);
+
+                        cout << "    * Enter password: ";
+                        getline(cin, password);
+
+                        if (username.find(' ') != string::npos || password.find(' ') != string::npos)
+                        {
+                            error("space");
+                        }
+                    } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
+                }
+
+                if (input.substr(0, 9) == "register " && count(input.begin(), input.end(), ' ') == 2 && input.find("  ") == std::string::npos)
+                {
+                    size_t space_pos;
+                    string temp_username, temp_password;
+                    
+                    space_pos = input.find(' ');
+                    temp_username = input.substr(space_pos + 1);
+                    space_pos = temp_username.find(' ');
+                    
+                    temp_password = temp_username.substr(space_pos + 1);
+                    temp_username.erase(space_pos);
+
+                    username = temp_username;
+                    password = temp_password;
+                }
 
                 // if successful register
                 user = new RegisteredUser(username, password);
@@ -240,24 +291,29 @@ int main()
                 clear();
                 welcome("successfulRegister");
             }
-            else if (input.substr(0, 9) == "register " && count(input.begin(), input.end(), ' ') == 2)
-            {
-                cout << "SECOND REGISTER OPTION" << endl;
-            }
-            else if (input.substr(0, 6) == "logout" && input.length() == 6)
+
+            if (input.substr(0, 4) == "quiz" && input.length() == 4)
             {
                 if (loggedin == "yes")
                 {
-                    cout << "Logged out successfully!" << endl;
-                    prefix = "";
-                    loggedin = "no";
-                    clear();
-                    welcome("startup");
+                    int correctAnswers;
+                    correctAnswers = quiz();
+                    
+                    if (correctAnswers == 0)
+                    {
+                        cout << "\nAll your answers were wrong :(\nNo points received.\n";
+                    }
+                    else if (correctAnswers == 404)
+                    {
+                        ;
+                    }
+                    else
+                    {
+                        cout << "Congratulations!\nYou answered " << correctAnswers << " questions!\nYou received " << correctAnswers * 5 << " points.";
+                        // code for adding the points to the user account
+                    }
                 }
-                else
-                {
-                    cout << "You're not logged in!" << endl;
-                }
+                else { error("signedOut"); }
             }
             
             if (loggedin == "yes")
@@ -299,6 +355,21 @@ int main()
                     error("signedOut");
             }
             
+            if (input.substr(0, 6) == "logout" && input.length() == 6)
+            {
+                if (loggedin == "yes")
+                {
+                    prefix = "";
+                    loggedin = "no";
+                    clear();
+                    welcome("successfulLogout");
+                }
+                else
+                {
+                    error("signedOut");
+                }
+            }
+
             if (input.length() <= 4) { input = decapitalize(input); }
             if ((input.substr(0, 4) == "quit" && input.length() == 4) || (input[0] == '0' && input.length() == 1) || (input[0] == 'q' && input.length() == 1))
             {

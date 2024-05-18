@@ -1,0 +1,11 @@
+[1] Three [2] Four [3] Two
+[1] Essa [2] Muhamad [3] Ibrahim
+[1] Bible [2] Quran [3] Torah
+[1] West [2] East [3] to Mecca
+[1] Allahu Akbar [2] Bism-allah [3] Al-Shahadah
+[1] June [2] Shaban [3] Ramadan
+[1] Caller [2] Al-Azan [3] Nothing
+[1] No [2] Yes [3] Sometimes
+[1] Haram [2] Halal [3] Both
+[1] Halal [2] Both [3] Haram
+[1] Shaban [2] October [3] January

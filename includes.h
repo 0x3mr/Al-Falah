@@ -9,6 +9,8 @@
 #include <cctype>
 #include <cstdlib>
 #include <algorithm>
+#include <vector>
+#include <random>
 
 
 using namespace std;
@@ -28,5 +30,6 @@ void clear();
 void error(string errorType);
 void welcome(string message);
 string decapitalize(string input);
+int quiz();
 
 #endif

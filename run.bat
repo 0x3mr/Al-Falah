@@ -9,4 +9,4 @@
 
 set SCRIPT_DIR=%~dp0
 cd "%SCRIPT_DIR%"
-g++ -o main main.cpp Functions/*.cpp -IFunctions -lwininet && main.exe
+g++ -J -O2 -o main main.cpp Functions/*.cpp -IFunctions -lwininet && main.exe
