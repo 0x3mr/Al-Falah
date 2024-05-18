@@ -35,110 +35,213 @@ class User
         void setLevel(const int &level) { this->level = level; }
 };
 
-class RegisteredUser : public User {
-public:
-    RegisteredUser(const string &username, const string &password): User(username, password) {}
+class RegisteredUser : public User
+{
+    public:
+        RegisteredUser(const string &username, const string &password): User(username, password) {}
 
-    ~RegisteredUser() {}
+        ~RegisteredUser() {}
 
-    bool login(const string &username, const string &password)
-    {
-        ifstream file("loginData.txt");
-        string line;
-        bool userFound = false;
-
-        while (getline(file, line))
+        bool login(const string &username, const string &password)
         {
-            string usernameFromFile, passwordFromFile;
-            size_t pos = line.find('*');
+            ifstream file("loginData.txt");
+            string line;
+            bool userFound = false;
 
-            usernameFromFile = line.substr(0, pos);
-            line.erase(0, pos + 1);
-
-            passwordFromFile = line;
-
-            if (usernameFromFile == username)
+            while (getline(file, line))
             {
-                userFound = true;
-                if (passwordFromFile == password)
+                string usernameFromFile, passwordFromFile;
+                size_t pos = line.find('*');
+
+                usernameFromFile = line.substr(0, pos);
+                line.erase(0, pos + 1);
+
+                passwordFromFile = line;
+
+                if (usernameFromFile == username)
                 {
-                    file.close();
-                    return true;
+                    userFound = true;
+                    if (passwordFromFile == password)
+                    {
+                        file.close();
+                        return true;
+                    }
+                    else
+                    {
+                        //cout << "Invalid password for user: " << username << endl;
+                        error("invalidPassword");
+                        file.close();
+                        return false;
+                    }
                 }
-                else
-                {
-                    //cout << "Invalid password for user: " << username << endl;
-                    error("invalidPassword");
-                    file.close();
-                    return false;
+            }
+
+            if (userFound == false)
+            {
+                //cout << "User " << username << " does not exist." << endl;
+                error("invalidUser");
+            }
+
+            file.close();
+            return false;
+        }
+
+        void signUp() {
+            ifstream file("loginData.txt");
+            string line;
+            bool userExists = false;
+
+            while (getline(file, line)) {
+                string usernameFromFile;
+                size_t pos = line.find('*');
+
+                usernameFromFile = line.substr(0, pos);
+
+                if (usernameFromFile == username) {
+                    userExists = true;
+                    break;
                 }
+            }
+
+            file.close();
+
+            if (userExists) {
+                //cout << "User " << username << " already exists. Cannot register." << endl;
+                error("existingUser");
+            } else {
+                ofstream file("loginData.txt", ios::app);
+                file << username << "*" << password << endl;
+                file.close();
             }
         }
 
-        if (userFound == false)
+        void forgotPassword(const string &username)
         {
-            //cout << "User " << username << " does not exist." << endl;
-            error("invalidUser");
-        }
+            ifstream file("loginData.txt");
+            string line;
 
-        file.close();
-        return false;
-    }
+            while (getline(file, line))
+            {
+                string usernameFromFile, passwordFromFile;
+                size_t pos = line.find('*');
 
-    void signUp() {
-        ifstream file("loginData.txt");
-        string line;
-        bool userExists = false;
+                usernameFromFile = line.substr(0, pos);
+                line.erase(0, pos + 1);
 
-        while (getline(file, line)) {
-            string usernameFromFile;
-            size_t pos = line.find('*');
+                passwordFromFile = line;
 
-            usernameFromFile = line.substr(0, pos);
-
-            if (usernameFromFile == username) {
-                userExists = true;
-                break;
+                if (usernameFromFile == username)
+                {
+                    cout << "   [+] Account Found!" << endl;
+                    cout << "   [!] Your Password: " << passwordFromFile << endl;
+                    break;
+                }
             }
-        }
-
-        file.close();
-
-        if (userExists) {
-            //cout << "User " << username << " already exists. Cannot register." << endl;
-            error("existingUser");
-        } else {
-            ofstream file("loginData.txt", ios::app);
-            file << username << "*" << password << endl;
             file.close();
         }
+};
+
+class PrayerTime
+{
+    private:
+        string url;
+        int bufferSize;
+        int salahFajr, salahSunrise, salahDuhr, salahAsr, salahMaghrib, salahIsha;
+        void scrapWebsite();
+        void extractTime(int salahLine, string& timeStr);
+
+    public:
+        //                                                   CALLING OF THE CONSTRUCTOR STRUCTURE
+        //
+        //                                    The line of where you will find each prayer in the data.txt file
+        //                                    25            28         31          34           37          40
+        //                                     ↓             ↓          ↓           ↓            ↓           ↓
+        //   PrayerTime( url , bufferSize , Fajr line , Sunrise line , Duhr line , Asr line , Maghrib line, Isha line )
+        //
+        PrayerTime(const string& url, int bufferSize, int salahFajr, int salahSunrise, int salahDuhr, int salahAsr, int salahMaghrib, int salahIsha)
+            : url(url), bufferSize(bufferSize), salahFajr(salahFajr), salahSunrise(salahSunrise), salahDuhr(salahDuhr), salahAsr(salahAsr), salahMaghrib(salahMaghrib), salahIsha(salahIsha) {}
+
+        string getFajrTime() { string time; extractTime(salahFajr, time); return time; }
+        string getSunriseTime() { string time; extractTime(salahSunrise, time); return time; }
+        string getDuhrTime() { string time; extractTime(salahDuhr, time); return time; }
+        string getAsrTime() { string time; extractTime(salahAsr, time); return time; }
+        string getMaghribTime() { string time; extractTime(salahMaghrib, time); return time; }
+        string getIshaTime() { string time; extractTime(salahIsha, time); return time; }
+};
+
+void PrayerTime::scrapWebsite()
+{
+    ofstream outfile("../data.txt");
+
+    if (!outfile.is_open())
+    {
+        cerr << "Error opening file for writing." << endl;
+        return; /* it stops reading the rest of the code */
     }
 
-    void forgotPassword(const string &username)
+    // Initialize WinINet
+    HINTERNET hInternet = InternetOpenA("WinINet", INTERNET_OPEN_TYPE_DIRECT, NULL, NULL, 0);
+    if (hInternet == NULL)
     {
-        ifstream file("loginData.txt");
-        string line;
+        cerr << "Failed to initialize WinINet." << endl;
+        return;
+    }
 
-        while (getline(file, line))
+    // Open the URL
+    HINTERNET hUrl = InternetOpenUrlA(hInternet, url.c_str(), NULL, 0, INTERNET_FLAG_RELOAD, 0);
+    if (hUrl == NULL)
+    {
+        //cerr << "Error opening URL: " << url << endl;
+        cerr << "Unable to connect to the internet." << endl;
+        InternetCloseHandle(hInternet);
+        return;
+    }
+
+    // Read from the website and write to the file
+    char buffer[bufferSize];
+    DWORD bytesRead;
+    while (InternetReadFile(hUrl, buffer, bufferSize, &bytesRead) && bytesRead > 0)
+    {
+        outfile.write(buffer, bytesRead);
+    }
+
+    InternetCloseHandle(hUrl);
+    InternetCloseHandle(hInternet);
+
+    outfile.close();
+}
+
+void PrayerTime::extractTime(int salahLine, string& timeStr)
+{
+    // Open the data.txt file
+    ifstream infile("../data.txt");
+
+    if (!infile.is_open())
+    {
+        cerr << "Error opening file." << endl;
+    }
+
+    string line, time;
+    int i, lineNumber = 0;
+
+    while (getline(infile, line))
+    {
+        lineNumber++;
+
+        if (lineNumber == salahLine)
         {
-            string usernameFromFile, passwordFromFile;
-            size_t pos = line.find('*');
-
-            usernameFromFile = line.substr(0, pos);
-            line.erase(0, pos + 1);
-
-            passwordFromFile = line;
-
-            if (usernameFromFile == username)
+            // Check if the line contains <span>
+            for (i = 0; line[i] != '/'; i++)
             {
-                cout << "   [+] Account Found!" << endl;
-                cout << "   [!] Your Password: " << passwordFromFile << endl;
-                break;
+                if (isdigit(line[i]) || line[i] == ':')
+                    time += line[i];
             }
         }
-        file.close();
     }
-};
+    timeStr = time;
+
+    infile.close();
+}
 
 //int main(int ac, char **av)
 int main()
@@ -176,9 +279,6 @@ int main()
         string loggedin = "no";
 
         RegisteredUser* user = nullptr;
-
-        // scrapWebsite();
-        // Add it back if user logins in only
 
         clear();
         welcome("startup");
@@ -231,6 +331,7 @@ int main()
                     // if successful login
                     if (user->login(username, password))
                     {
+                        // THINGS THAT HAPPEN WHEN YOU ARE LOGGED IN
                         cout << "\n";
                         prefix = username;
                         loggedin = "yes";
@@ -301,15 +402,17 @@ int main()
                     
                     if (correctAnswers == 0)
                     {
-                        cout << "\nAll your answers were wrong :(\nNo points received.\n";
+                        clear();
+                        cout << "\nAll your answers were wrong :(\nNo points received.\n\n";
                     }
                     else if (correctAnswers == 404)
                     {
-                        ;
+                        clear();
                     }
                     else
                     {
-                        cout << "Congratulations!\nYou answered " << correctAnswers << " questions!\nYou received " << correctAnswers * 5 << " points.";
+                        clear();
+                        cout << "\nCongratulations!\nYou answered " << correctAnswers << " questions!\nYou received " << correctAnswers * 5 << " points.\n\n";
                         // code for adding the points to the user account
                     }
                 }
@@ -318,6 +421,8 @@ int main()
             
             if (loggedin == "yes")
             {
+                PrayerTime prayerTimes(url, bufferSize, salahFajr, salahSunrise, salahDuhr, salahAsr, salahMaghrib, salahIsha);
+
                 if (input.substr(0, 5) == "fetch" && input.length() == 5)
                 {
                     cout << "\n  List of prayers you can fetch:\n";
@@ -326,27 +431,27 @@ int main()
                 }
                 else if (input.substr(0, 10) == "fetch fajr" && input.length() == 10)
                 {
-                    extractTime(salahFajr);
+                    cout << "Fajr Time: " << prayerTimes.getFajrTime() << endl;
                 }
                 else if (input.substr(0, 13) == "fetch sunrise" && input.length() == 13)
                 {
-                    extractTime(salahSunrise);
+                    cout << "Sunrise Time: " << prayerTimes.getSunriseTime() << endl;
                 }
                 else if (input.substr(0, 10) == "fetch duhr" && input.length() == 10)
                 {
-                    extractTime(salahDuhr);
+                    cout << "Duhr Time: " << prayerTimes.getDuhrTime() << endl;
                 }
                 else if (input.substr(0, 9) == "fetch asr" && input.length() == 9)
                 {
-                    extractTime(salahAsr);
+                    cout << "Asr Time: " << prayerTimes.getAsrTime() << endl;
                 }
                 else if (input.substr(0, 13) == "fetch maghrib" && input.length() == 13)
                 {
-                    extractTime(salahMaghrib);
+                    cout << "Maghrib Time: " << prayerTimes.getMaghribTime() << endl;
                 }
                 else if (input.substr(0, 10) == "fetch isha" && input.length() == 10)
                 {
-                    extractTime(salahIsha);
+                    cout << "Isha Time: " << prayerTimes.getIshaTime() << endl;
                 }
             }
             else

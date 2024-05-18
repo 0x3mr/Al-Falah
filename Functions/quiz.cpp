@@ -1,7 +1,11 @@
 #include "../includes.h"
 
-int quiz()
-{
+struct Question {
+    string text;
+    string choices;
+};
+
+int quiz() {
     int choi;
     welcome("quiz");
 
@@ -10,37 +14,41 @@ int quiz()
     if (choi == 1)
     {
         int correctAnswers = 0;
-        string line, lineChoice, question;
         ifstream file("questions.txt");
         ifstream file2("questions-choices.txt");
 
         clear();
 
-        if (!file || !file2) {
+        if (!file || !file2)
+        {
             cerr << "Error: Unable to open questions.txt or questions-choices.txt file." << endl;
             return (0);
         }
 
-        // Randomize the order of questions
-        vector<string> questions, choices;
+        // Read questions and choices into a vector of Question objects
+        vector<Question> questions;
+        string line, lineChoice;
         while (getline(file, line) && getline(file2, lineChoice))
         {
-            questions.push_back(line);
-            choices.push_back(lineChoice);
+            Question q;
+            q.text = line;
+            q.choices = lineChoice;
+            questions.push_back(q);
         }
         file.close();
         file2.close();
 
+        // Shuffle the questions vector
         random_device rd;
         mt19937 g(rd());
         shuffle(questions.begin(), questions.end(), g);
-        shuffle(choices.begin(), choices.end(), g);
 
         // Display the first 5 questions and get user input
         for (int i = 0; i < 5; i++)
         {
-            string question = questions[i];
-            string choice = choices[i];
+            Question q = questions[i];
+            string question = q.text;
+            string choice = q.choices;
             int answerIndex = question.length() - 1;
             char correctAnswer = question[answerIndex];
             cout << "    " << question.substr(0, answerIndex) << endl; // Display the question
@@ -50,11 +58,13 @@ int quiz()
             int userChoice;
             cin >> userChoice;
 
+
             // Evaluate the user's choice
             if (userChoice >= 1 && userChoice <= 3)
             {
-                char userAnswer = 'a' + userChoice - 1;
-                if (userAnswer == correctAnswer)
+                int int_correctAnswer = atoi(&correctAnswer);
+                //char userAnswer = 'a' + userChoice - 1;
+                if (int_correctAnswer == userChoice)
                 {
                     correctAnswers++;
                     //cout << "Great Work!" << endl;
@@ -62,7 +72,7 @@ int quiz()
             }
             else
             {
-                cout << "Invalid choice. Please enter 1, 2, or 3." << endl;
+                cout << "      Invalid choice. Please enter 1, 2, or 3." << endl;
                 i--; // Repeat the same question
             }
         }
@@ -73,5 +83,4 @@ int quiz()
     {
         return 404;
     }
-    return (0);
 }
