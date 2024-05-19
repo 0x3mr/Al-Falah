@@ -27,7 +27,7 @@ void welcome(string message)
         cout << "\n                    |  quiz";
         cout << "\n                    |  cmds";
         cout << "\n         Commands   |  settings";
-        cout << "\n                    |  pints";
+        cout << "\n                    |  points";
         cout << "\n                    |  logout";
         cout << "\n                    |  quit\n\n\n";
     }
@@ -48,7 +48,7 @@ void welcome(string message)
         cout << "\n                    |  quiz";
         cout << "\n                    |  cmds";
         cout << "\n         Commands   |  settings";
-        cout << "\n                    |  pints";
+        cout << "\n                    |  points";
         cout << "\n                    |  logout";
         cout << "\n                    |  quit\n\n\n";
     }
