@@ -24,8 +24,12 @@ void welcome(string message)
         cout << "          Welcome to Al-Falah Prayer App.";
         cout << "\n   Please Log-in or Sign-up to use the app.\n";
         cout << "\n                    |  fetch";
-        cout << "\n         Commands   |  quiz";
-        cout << "\n                    |  cmds\n\n\n";
+        cout << "\n                    |  quiz";
+        cout << "\n                    |  cmds";
+        cout << "\n         Commands   |  settings";
+        cout << "\n                    |  pints";
+        cout << "\n                    |  logout";
+        cout << "\n                    |  quit\n\n\n";
     }
     else if (message == "successfulLogout")
     {
@@ -41,8 +45,12 @@ void welcome(string message)
         cout << "             Welcome to Al-Falah Prayer App.";
         cout << "\n  You may use the app using the following commands:\n";
         cout << "\n                    |  fetch";
-        cout << "\n         Commands   |  quiz";
-        cout << "\n                    |\n\n\n";
+        cout << "\n                    |  quiz";
+        cout << "\n                    |  cmds";
+        cout << "\n         Commands   |  settings";
+        cout << "\n                    |  pints";
+        cout << "\n                    |  logout";
+        cout << "\n                    |  quit\n\n\n";
     }
     else if (message == "successfulLogin_Special")
     {

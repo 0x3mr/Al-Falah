@@ -7,6 +7,13 @@
 
 @REM g++ main.cpp -o main -lwininet
 
+@REM set SCRIPT_DIR=%~dp0
+@REM cd "%SCRIPT_DIR%"
+@REM g++ -J -O2 -o main main.cpp Functions/*.cpp -IFunctions -lwininet && main.exe
+
+@REM @echo off
+
 set SCRIPT_DIR=%~dp0
 cd "%SCRIPT_DIR%"
-g++ -J -O2 -o main main.cpp Functions/*.cpp -IFunctions -lwininet && main.exe
+
+g++ -O2 -o main main.cpp includes.h Functions/*.cpp Classes/*.cpp -IFunctions -IClasses -lwininet && main.exe
