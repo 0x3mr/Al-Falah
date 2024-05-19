@@ -12,7 +12,6 @@
 #include <vector>
 #include <random>
 
-
 using namespace std;
 
 extern int bufferSize;

@@ -25,7 +25,7 @@ void welcome(string message)
         cout << "\n   Please Log-in or Sign-up to use the app.\n";
         cout << "\n                    |  fetch";
         cout << "\n         Commands   |  quiz";
-        cout << "\n                    |\n\n\n";
+        cout << "\n                    |  cmds\n\n\n";
     }
     else if (message == "successfulLogout")
     {
@@ -43,6 +43,10 @@ void welcome(string message)
         cout << "\n                    |  fetch";
         cout << "\n         Commands   |  quiz";
         cout << "\n                    |\n\n\n";
+    }
+    else if (message == "successfulLogin_Special")
+    {
+        cout << "\n                  Welcome to Al-Falah Prayer App.\n\n";
     }
     else if (message == "quiz")
     {

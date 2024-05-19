@@ -401,6 +401,8 @@ int main()
         clear();
         welcome("startup");
 
+        PrayerTime prayerTimes(url, bufferSize, salahFajr, salahSunrise, salahDuhr, salahAsr, salahMaghrib, salahIsha);
+
         while (1)
         {
             input = "";
@@ -500,7 +502,18 @@ int main()
                         prefix = username;
                         loggedin = "yes";
                         clear();
-                        welcome("successfulLogin");
+
+                        if (user->getSettings() == "ON")
+                        {
+                            welcome("successfulLogin_Special");
+                            cout << "        Fajr | Sunrise |  Duhr   |  Asr   | Maghrib | Isha\n";
+                            cout << "        " << prayerTimes.getFajrTime() << "     " << prayerTimes.getSunriseTime() << "     " << prayerTimes.getDuhrTime() << "     " << prayerTimes.getAsrTime() << "     " << prayerTimes.getMaghribTime() << "     " << prayerTimes.getIshaTime( ) << "\n\n";
+                            cout << "             Type 'commands' to use the application..\n\n";
+                        }
+                        else
+                        {
+                            welcome("successfulLogin");
+                        }
 
                         delete user;
                         user = new RegisteredUser(username, password);
@@ -524,6 +537,47 @@ int main()
                 // cout << "GLOBAL - INFO HERE:  " << user->getLevel() << endl;
                 // cout << "GLOBAL - INFO HERE:  " << user->getSettings() << endl;
             // }
+
+            if (input.substr(0, 8) == "settings" && input.length() == 8)
+            {
+                if (loggedin == "yes")
+                {
+                    string mode;
+                    cout << "\n";
+                    cout << "    | Profile > " << user->getusername() << "  > Settings >\n    |\n";
+                    cout << "    | - Special Welcome: " << user->getSettings() << "\n";
+                    //cout << "       (when enabled, it showcases prayer times on login)\n";
+                    cout << "    | - Reminders: undefined\n\n";
+                    //cout << "       (currently unavailable)\n";
+
+                    do {
+                        cout << "    | Would you like to toggle on/off special welcome?\n    | (type 1 to toggle, 0 to cancel)\n    | ";
+                        getline(cin, mode);
+
+                        if (mode == "1") {
+                            if (user->getSettings() == "ON") {
+                                user->setSettings("OFF");
+                                user->saveUserData("userData.txt");
+                                cout << "\n    | Special welcome screen has been turned off.\n\n";
+                            } else {
+                                user->setSettings("ON");
+                                user->saveUserData("userData.txt");
+                                cout << "\n    | Special welcome screen has been turned on.\n\n";
+                            }
+                            break;
+                        } else if (mode == "0") {
+                            cout << "\n    | No changes made to the settings.\n\n";
+                            break;
+                        } else {
+                            cout << "\n    | Invalid input. Please enter either 1 or 0.\n";
+                        }
+                    } while (true);
+                }
+                else
+                {
+                    error("signedOut");
+                }
+            }
 
             if (input.substr(0, 4) == "quiz" && input.length() == 4)
             {
@@ -553,15 +607,18 @@ int main()
                 else { error("signedOut"); }
             }
             
+            if ((input.substr(0, 8) == "commands" && input.length() == 8) || (input.substr(0, 4) == "cmds" && input.length() == 4))
+            {
+                    cout << "\n  List of available commands:\n";
+                    cout << "   - fetch\n   - quiz\n   - quit\n   - logout\n   - cmds\n \n";
+            }
+
             if (loggedin == "yes")
             {
-                PrayerTime prayerTimes(url, bufferSize, salahFajr, salahSunrise, salahDuhr, salahAsr, salahMaghrib, salahIsha);
-
                 if (input.substr(0, 5) == "fetch" && input.length() == 5)
                 {
                     cout << "\n  List of prayers you can fetch:\n";
                     cout << "   - fajr\n   - sunrise\n   - duhr\n   - asr\n   - maghrib\n   - isha\n \n";
-
                 }
                 else if (input.substr(0, 10) == "fetch fajr" && input.length() == 10)
                 {
