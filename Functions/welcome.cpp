@@ -7,8 +7,8 @@ void welcome(string message)
         cout << "\n Assalamu Alaikum wa Rahmatullahi wa Barakatuh\n\n";
         cout << "        Welcome to Al-Falah Prayer App.";
         cout << "\n   Please Log-in or Sign-up to use the app.\n";
-        cout << "\n         Commands   |  login <username>";
-        cout << "\n                    |  register <username>\n\n\n";
+        cout << "\n         Commands   |  login";
+        cout << "\n                    |  register\n\n\n";
     }
     else if (message == "login")
     {
@@ -36,8 +36,8 @@ void welcome(string message)
         cout << "\n          You have signed out successfully!\n\n";
         cout << "            Welcome to Al-Falah Prayer App.";
         cout << "\n  You may use the app using the following commands:\n";
-        cout << "\n         Commands   |  login <username>";
-        cout << "\n                    |  register <username>\n\n\n";
+        cout << "\n         Commands   |  login";
+        cout << "\n                    |  register\n\n\n";
     }
     else if (message == "successfulLogin")
     {
