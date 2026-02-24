@@ -28,14 +28,14 @@ void Database::initialize() {
 
     const char* sql = R"(
 
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL UNIQUE,
             password_hash TEXT NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
             );
 
-        CREATE TABLE prayer_records (
+        CREATE TABLE IF NOT EXISTS prayer_records (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             prayer_name TEXT NOT NULL,
@@ -45,15 +45,15 @@ void Database::initialize() {
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
 
-        CREATE TABLE user_settings (
+        CREATE TABLE IF NOT EXISTS user_settings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             adhan_enabled BOOLEAN DEFAULT 1,
             adhan_sound TEXT DEFAULT 'default.mp3',
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
-        
-        CREATE TABLE prayer_times (
+
+        CREATE TABLE IF NOT EXISTS prayer_times (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             prayer_name TEXT NOT NULL,
             adhan_time TIME NOT NULL
