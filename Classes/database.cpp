@@ -1,6 +1,5 @@
 #include "headers/database.h"
 #include <iostream>
-
 Database::Database() : db(nullptr) {}
 
 Database::~Database() {

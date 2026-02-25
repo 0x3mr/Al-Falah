@@ -3,28 +3,23 @@
 #include "database.h"
 
 #include <iostream>
-class login {
+class Login {
 private: 
     Database& db;  // Reference to the database for user authentication
 public:
-    login(Database& database) : db(database) {}
+    Login(Database& database) ;
 
-    void DisplayLoginScreen() {}
+   
 
-    bool authenticate(const std::string& username, const std::string& password) {}
+    bool authenticate(const std::string& username, const std::string& password) ;
 
     
-    void Dispaly_message(bool authenticate){}
+    void Dispaly_message(bool authenticate);
 
-    void Registery() {}
+    void Registery() ;
+
+    void DisplayLoginScreen();
     
-
-
-
-
-
-
-
 };
 
 

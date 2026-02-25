@@ -13,8 +13,8 @@ private:
     string created_at;
 public:
 
-    User(string username ,string password_hash){};
-    User(int id , string username ,string password_hash, string created_at){};
+    User(string username ,string password_hash);
+    User(int id , string username ,string password_hash, string created_at);
 
 
 
