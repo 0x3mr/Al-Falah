@@ -17,7 +17,7 @@ public:
     void initialize();
     void close();
 
-    sqlite3* getDB();  // for later use (login, insert, etc.)
+    sqlite3* getDB();  
 };
 
 
