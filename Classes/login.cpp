@@ -85,7 +85,7 @@ void Login::Registery() {
 
     sqlite3_finalize(stmt);
 }
-void Login::DisplayLoginScreen(){
+int Login::DisplayLoginScreen() {
     std::string username, password;
 
     std::cout << "Welcome to Alflalah Prayer App!" << std::endl;
@@ -94,9 +94,37 @@ void Login::DisplayLoginScreen(){
 
     std::cout << "Username: ";
     std::cin >> username;
+
     std::cout << "Password: ";
     std::cin >> password;
+
     bool isAuthenticated = authenticate(username, password);
     Dispaly_message(isAuthenticated);
 
+    if (!isAuthenticated) {
+        return -1;  // ❌ login failed
+    }
+
+    // ✅ Fetch user_id from DB
+    sqlite3* conn = db.getDB();
+
+    const char* sql = "SELECT id FROM users WHERE username = ?;";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to fetch user ID\n";
+        return -1;
+    }
+
+    sqlite3_bind_text(stmt, 1, username.c_str(), -1, SQLITE_STATIC);
+
+    int user_id = -1;
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        user_id = sqlite3_column_int(stmt, 0);
+    }
+
+    sqlite3_finalize(stmt);
+
+    return user_id;  
 }

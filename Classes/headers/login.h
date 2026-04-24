@@ -18,7 +18,7 @@ public:
 
     void Registery() ;
 
-    void DisplayLoginScreen();
+    int DisplayLoginScreen();
     
 };
 
