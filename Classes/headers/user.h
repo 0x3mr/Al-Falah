@@ -2,7 +2,6 @@
 #define USER_H
 #include <iostream> 
 #include <string>
-#include "database.h"
 using namespace std;
 
 class User {
@@ -11,20 +10,27 @@ private:
     string username;
     string password_hash;
     string created_at;
+    string last_location;
 public:
 
-    User(string username ,string password_hash);
-    User(int id , string username ,string password_hash, string created_at);
+    User(const std::string& username, const std::string& password_hash);
+    User(int id,
+         const std::string& username,
+         const std::string& password_hash,
+         const std::string& created_at,
+         const std::string& last_location);
 
 
 
-    int getid()const;
-    string getusername()const;
-    string getpassword_hash()const;
-    string getcreated_at()const;
+    int getId() const;
+    void setId(int id);
+    const std::string& getUsername() const;
+    const std::string& getPasswordHash() const;
+    const std::string& getCreatedAt() const;
+    const std::string& getLastLocation() const;
+    void setLastLocation(const std::string& location);
+    // void saveLocation(Database& db, const std::string& location);
 
-
-    
 
 
 };
