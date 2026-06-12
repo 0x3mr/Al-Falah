@@ -1,374 +1,290 @@
-#include "includes.h" // Include a header file containing other included files
-#include "Classes/User.h" // Include the User class header file
-#include "Classes/RegisteredUser.h" // Include the RegisteredUser class header file
-#include "Classes/PrayerTime.h" // Include the PrayerTime class header file
+#include "Classes/headers/database.h"
+#include "Classes/headers/login.h"
+#include "Classes/headers/location.h"
+#include "Classes/headers/prayer_time.h"
+#include "Classes/headers/prayer_records.h"
 
-int bufferSize = 1024; // Set a buffer size for reading data
+#include <iostream>
 
-// Line numbers where each salah time is included in data.txt
-int salahFajr = 25; // Line number for Fajr salah time
-int salahSunrise = 28; // Line number for Sunrise salah time
-int salahDuhr = 31; // Line number for Duhr salah time
-int salahAsr = 34; // Line number for Asr salah time
-int salahMaghrib = 37; // Line number for Maghrib salah time
-int salahIsha = 40; // Line number for Isha salah time
+using namespace std;
+#include <chrono>
+#include <thread>
+#include <sqlite3.h>
+#include <iostream>
 
-string url = "https://salah.com"; // URL for prayer times data
+void debugDatabase(Database& db) {
+    sqlite3* conn = db.getDB();
 
-//int main(int ac, char **av) // Original main function signature, commented out
-int main() // Simplified main function signature
-{
-    string mode; // Variable to store the user's chosen interface mode
+    const char* sql = "SELECT id, username, created_at FROM users;";
 
-    clear(); // Clear the console screen
+    sqlite3_stmt* stmt;
 
-    /* Choose mode of the application */
-    // If 1 it will use CLI
-    // If 2 it will use GUI but it's in development atm
-    // If 0 it will exit the program
-    while (1) // Infinite loop until user chooses a valid mode
-    {
-        cout << "\nWhat interface would you like to use?\nType [1] for CLI [2] for GUI [0] to exit: "; // Prompt user to choose an interface mode
-        getline(cin, mode); // Read user's input into the mode variable
+    if (sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to fetch users\n";
+        return;
+    }
 
-        //mode = '1'; // THIS IS USED FOR DEVELOPMENT ONLY, commented out
+    std::cout << "\n===== USERS TABLE =====\n";
 
-        if (mode.length() == 1) // Check if the input is a single character
-        {
-            if (mode[0] == '0' || mode[0] == '1' || mode[0] == '2') // Check if the input is one of the valid options
-                break; // Exit the loop if valid input
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        const unsigned char* username = sqlite3_column_text(stmt, 1);
+        const unsigned char* created_at = sqlite3_column_text(stmt, 2);
+
+        std::cout << "ID: " << id
+                  << " | Username: " << username
+                  << " | Created: " << created_at << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+void debugPrayerRecords(Database& db) {
+    sqlite3* conn = db.getDB();
+
+    const char* sql = "SELECT user_id, prayer_name, prayer_date, completed FROM prayer_records;";
+
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to fetch prayer records\n";
+        return;
+    }
+
+    std::cout << "\n===== PRAYER RECORDS =====\n";
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int user_id = sqlite3_column_int(stmt, 0);
+        const unsigned char* prayer = sqlite3_column_text(stmt, 1);
+        const unsigned char* date = sqlite3_column_text(stmt, 2);
+        int completed = sqlite3_column_int(stmt, 3);
+
+        std::cout << "User: " << user_id
+                  << " | Prayer: " << prayer
+                  << " | Date: " << date
+                  << " | Completed: " << completed << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+}
+void debugSingleUser(Database& db, int user_id) {
+    sqlite3* conn = db.getDB();
+
+    const char* sql = "SELECT username FROM users WHERE id = ?;";
+    sqlite3_stmt* stmt;
+
+    sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr);
+    sqlite3_bind_int(stmt, 1, user_id);
+
+    if (sqlite3_step(stmt) == SQLITE_ROW) {
+        const unsigned char* username = sqlite3_column_text(stmt, 0);
+        std::cout << "\nUser Found: " << username << std::endl;
+    } else {
+        std::cout << "\nUser NOT found\n";
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+
+void getAllUsers(Database& db) {
+    sqlite3* conn = db.getDB();
+
+    const char* sql = "SELECT id, username, created_at, last_location FROM users;";
+    sqlite3_stmt* stmt;
+
+    if (sqlite3_prepare_v2(conn, sql, -1, &stmt, nullptr) != SQLITE_OK) {
+        std::cerr << "Failed to prepare query\n";
+        return;
+    }
+
+    std::cout << "\n===== ALL USERS =====\n";
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        int id = sqlite3_column_int(stmt, 0);
+        const unsigned char* username = sqlite3_column_text(stmt, 1);
+        const unsigned char* created_at = sqlite3_column_text(stmt, 2);
+        const unsigned char* location = sqlite3_column_text(stmt, 3);
+
+        std::cout << "ID: " << id
+                  << " | Username: " << username
+                  << " | Created: " << created_at
+                  << " | Location: " << (location ? (const char*)location : "NULL")
+                  << std::endl;
+    }
+
+    sqlite3_finalize(stmt);
+}
+
+
+void runPrayerSystem(Database& db, int user_id) {
+
+    Location loc;
+    int choice;
+
+    cout << "\nChoose Location Method:\n";
+    cout << "1. Automatic\n";
+    cout << "2. Manual\n";
+    cout << "Choice: ";
+    cin >> choice;
+
+    if (choice == 1) {
+        loc = loc.getCurrentLocation();
+    } else {
+        loc = loc.manuallySetLocation();
+    }
+
+    cout << "\nLocation set:\n";
+    loc.displayLocation();
+
+    double lat = loc.getLatitude();
+    double lon = loc.getLongitude();
+    string locationStr = loc.getLocation();
+    loc.saveLocation(db, locationStr, user_id);
+    
+
+    
+    
+    PrayerTime pt(db);
+    pt.calculatePrayerTimes(lat, lon);
+
+    cout << "\nToday's Prayer Times:\n";
+    pt.display();
+
+    char adhanChoice;
+    cout << "\nDo you want Adhan? (y/n): ";
+    cin >> adhanChoice;
+
+    bool enableAdhan = (adhanChoice == 'y' || adhanChoice == 'Y');
+
+   
+    while (true) {
+
+    cout << "\n===== Prayer System Menu =====\n";
+    cout << "1. Show Next Prayer\n";
+    cout << "2. Wait for Next Prayer (Countdown)\n";
+    cout << "3. Back to Main Menu\n";
+    cout << "Choice: ";
+
+    int option;
+    cin >> option;
+
+    if (option == 3) {
+        cout << "Returning to main menu...\n";
+        break; // 🔥 EXIT LOOP → goes back to main()
+    }
+
+    auto next = pt.getNextPrayer();
+
+    if (next.second == -1) {
+        cout << "[ERROR] Cannot get next prayer\n";
+        break;
+    }
+
+    cout << "\nNext Prayer: " << next.first << endl;
+
+    if (option == 2) {
+        pt.showCountdown();
+        cout << "\n===== " << next.first << " TIME =====\n";
+
+        if (enableAdhan) {
+            cout << "🔊 Playing Adhan...\n";
+        }
+
+        char prayed;
+        cout << "Did you pray " << next.first << "? (y/n): ";
+        cin >> prayed;
+
+        PrayerRecord record(user_id, next.first, "today");
+
+        if (prayed == 'y' || prayed == 'Y') {
+            record.save(db);
+            record.markCompleted(db);
+            cout << "Prayer saved as completed.\n";
+        } else {
+            record.save(db);
+            cout << "Prayer saved as NOT completed.\n";
+        }
+    }
+}
+}
+int main() {
+    Database db;
+
+    
+    if (!db.connect("db/Alfalah.db")) {
+        cerr << "Database connection failed.\n";
+        return 1;
+    }
+
+    db.initialize();
+
+    Login login(db);
+
+    int choice;
+
+    while (true) {
+        cout << "\n========== Alfalah ==========\n";
+        cout << "1. Login\n";
+        cout << "2. Register\n";
+        cout << "3. Debug (Check DB)\n";
+        cout << "4. Exit\n";
+        cout << "Choice: ";
+
+        cin >> choice;
+
+        
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Invalid input. Try again.\n";
+            continue;
+        }
+
+       
+        if (choice == 1) {
+
+            int user_id = login.DisplayLoginScreen();
+
+            if (user_id == -1) {
+                cout << "Login failed.\n";
+                continue;
+            }
+
+            cout << "Login successful! User ID: " << user_id << endl;
+
+            
+            cout << "\n[DEBUG] Verifying user in DB...\n";
+            debugSingleUser(db, user_id);
+
+            
+            runPrayerSystem(db, user_id);
+        }
+
+        
+        else if (choice == 2) {
+            login.Registery();
+        }
+
+        
+        else if (choice == 3) {
+            cout << "\n===== DEBUG MODE =====\n";
+            debugDatabase(db);
+            debugPrayerRecords(db);
+            getAllUsers(db);
+        }
+
+        
+        else if (choice == 4) {
+            cout << "Exiting application...\n";
+            break;
+        }
+
+        else {
+            cout << "Invalid choice. Try again.\n";
         }
     }
 
-    // EXITING PROGRAM CODE
-    if (mode[0] == '0') // If user chose to exit
-    {
-        cout << "\nExiting program..\n" << endl; // Print exit message
-        return (0); // Return 0 to indicate successful exit
-    }
-
-    // Entering CLI Mode
-    if (mode[0] == '1') // If user chose to use CLI
-    {
-        string input; // Variable to store user's input
-        string username = "-", password = "-"; // Initialize username and password to default values
-        string prefix = ""; // Initialize prefix string to empty
-        string loggedin = "no"; // Initialize login status to "no"
-
-        RegisteredUser* user = nullptr; // Pointer to a RegisteredUser object, initialized to null
-
-        clear(); // Clear the console screen
-        welcome("startup"); // Print a welcome message
-
-        PrayerTime prayerTimes(url, bufferSize, salahFajr, salahSunrise, salahDuhr, salahAsr, salahMaghrib, salahIsha); // Create a PrayerTime object
-
-        while (1) // Infinite loop for CLI mode
-        {
-            input = ""; // Reset input variable
-            cout << prefix << " $ "; // Print the command prompt
-            getline(cin, input); // Read user's input into the input variable
-
-            // Handle register command
-            if (input.substr(0, 8) == "register") 
-            {           
-                if (input.substr(0, 8) == "register" && input.length() == 8)
-                {
-                    welcome("register"); // Print a welcome message for registration
-                    do
-                    {
-                        cout << "    * Enter username: "; // Prompt user to enter username
-                        getline(cin, username);
-
-                        cout << "    * Enter password: "; // Prompt user to enter password
-                        getline(cin, password);
-
-                        if (username.find(' ') != string::npos || password.find(' ') != string::npos)
-                        {
-                            error("space"); // Handle error if username or password contain spaces
-                        }
-                    } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
-                }
-
-                if (input.substr(0, 9) == "register " && count(input.begin(), input.end(), ' ') == 2 && input.find("  ") == std::string::npos)
-                {
-                    size_t space_pos;
-                    string temp_username, temp_password;
-
-                    space_pos = input.find(' ');
-                    temp_username = input.substr(space_pos + 1);
-                    space_pos = temp_username.find(' ');
-
-                    temp_password = temp_username.substr(space_pos + 1);
-                    temp_username.erase(space_pos);
-
-                    username = temp_username;
-                    password = temp_password;
-                }
-
-                // if successful register
-                user = new RegisteredUser(username, password);
-                user->signUp();
-                cout << "\n";
-                prefix = username;
-                loggedin = "yes";
-                clear();
-                welcome("successfulRegister"); // Print a welcome message for successful registration
-            }
-
-            // Handle login command
-            if (input.substr(0, 5) == "login")
-            {
-                if (input.substr(0, 5) == "login" && input.length() == 5)
-                {
-                    welcome("login"); // Print a welcome message for login
-                    do
-                    {
-                        cout << "    * Enter username: "; // Prompt user to enter username
-                        getline(cin, username);
-
-                        cout << "    * Enter password: "; // Prompt user to enter password
-                        getline(cin, password);
-
-                        if (username.find(' ') != string::npos || password.find(' ') != string::npos)
-                        {
-                            error("space"); // Handle error if username or password contain spaces
-                        }
-                    } while (username.find(' ') != string::npos || password.find(' ') != string::npos);
-                }
-
-                if (input.substr(0, 6) == "login " && count(input.begin(), input.end(), ' ') == 2 && input.find("  ") == std::string::npos)
-                {
-                    size_t space_pos;
-                    string temp_username, temp_password;
-
-                    space_pos = input.find(' ');
-                    temp_username = input.substr(space_pos + 1);
-                    space_pos = temp_username.find(' ');
-
-                    temp_password = temp_username.substr(space_pos + 1);
-                    temp_username.erase(space_pos);
-
-                    username = temp_username;
-                    password = temp_password;
-                }
-
-                if (username != "-" && password != "-")
-                {
-                    user = new RegisteredUser(username, password);
-                    // if successful login
-                    if (user->login(username, password))
-                    {
-                        // THINGS THAT HAPPEN WHEN YOU ARE LOGGED IN
-                        cout << "\n";
-                        prefix = username;
-                        loggedin = "yes";
-                        clear();
-
-                        if (user->getSettings() == "ON")
-                        {
-                            welcome("successfulLogin_Special"); // Print a special welcome message
-                            cout << "        Fajr | Sunrise |  Duhr   |  Asr   | Maghrib | Isha\n";
-                            cout << "        " << prayerTimes.getFajrTime() << "     " << prayerTimes.getSunriseTime() << "     " << prayerTimes.getDuhrTime() << "     " << prayerTimes.getAsrTime() << "     " << prayerTimes.getMaghribTime() << "     " << prayerTimes.getIshaTime( ) << "\n\n";
-                            cout << "             Type 'commands' to use the application..\n\n";
-                        }
-                        else
-                        {
-                            welcome("successfulLogin"); // Print a regular welcome message
-                        }
-
-                        delete user;
-                        user = new RegisteredUser(username, password);
-                        user->loadUserData("userData.txt");
-                    }
-                    else
-                    {
-                        error("invalidLogin"); // Handle error if login fails
-                    }
-                    //delete user;
-                }
-            }
-
-            //  TESTER & DEBUGGING
-            //
-            // if (user != nullptr && prefix != "")
-            // {
-                // cout << "GLOBAL - INFO HERE:  " << user->getusername() << endl;
-                // cout << "GLOBAL - INFO HERE:  " << user->getPassword() << endl;
-                // cout << "GLOBAL - INFO HERE:  " << user->getPoints() << endl;
-                // cout << "GLOBAL - INFO HERE:  " << user->getLevel() << endl;
-                // cout << "GLOBAL - INFO HERE:  " << user->getSettings() << endl;
-            // }
-
-            // Handle settings command
-            if (input.substr(0, 8) == "settings" && input.length() == 8)
-            {
-                if (loggedin == "yes")
-                {
-                    string mode;
-                    cout << "\n";
-                    cout << "    | Profile > " << user->getusername() << "  > Settings >\n    |\n";
-                    cout << "    | - Special Welcome: " << user->getSettings() << "\n";
-                    //cout << "       (when enabled, it showcases prayer times on login)\n";
-                    cout << "    | - Reminders: undefined\n\n";
-                    //cout << "       (currently unavailable)\n";
-
-                    do {
-                        cout << "    | Would you like to toggle on/off special welcome?\n    | (type 1 to toggle, 0 to cancel)\n    | ";
-                        getline(cin, mode);
-
-                        if (mode == "1") {
-                            if (user->getSettings() == "ON") {
-                                user->setSettings("OFF");
-                                user->saveUserData("userData.txt");
-                                cout << "\n    | Special welcome screen has been turned off.\n\n";
-                            } else {
-                                user->setSettings("ON");
-                                user->saveUserData("userData.txt");
-                                cout << "\n    | Special welcome screen has been turned on.\n\n";
-                            }
-                            break;
-                        } else if (mode == "0") {
-                            cout << "\n    | No changes made to the settings.\n\n";
-                            break;
-                        } else {
-                            cout << "\n    | Invalid input. Please enter either 1 or 0.\n";
-                        }
-                    } while (true);
-                }
-                else
-                {
-                    error("signedOut"); // Handle error if user is not logged in
-                }
-            }
-
-            // Handle points command
-            if (input.substr(0, 6) == "points" && input.length() == 6)
-            {
-                if (loggedin == "yes")
-                {
-                    cout << "\n * You have " << user->getPoints() << " on your account.\n\n";
-                }
-                else { error("signedOut"); } // Handle error if user is not logged in
-            }
-
-            // Handle quiz command
-            if (input.substr(0, 4) == "quiz" && input.length() == 4)
-            {
-                if (loggedin == "yes")
-                {
-                    int correctAnswers;
-                    correctAnswers = quiz();
-
-                    if (correctAnswers == 0)
-                    {
-                        clear();
-                        cout << "\nAll your answers were wrong :(\nNo points received.\n\n";
-                    }
-                    else if (correctAnswers == 404)
-                    {
-                        clear();
-                    }
-                    else
-                    {
-                        clear();
-                        cout << "\nCongratulations!\nYou answered " << correctAnswers << " questions!\nYou received " << correctAnswers * 5 << " points.\n\n";
-                        // code for adding the points to the user account
-                        user->addPoints(correctAnswers * 5);
-                        user->saveUserData("userData.txt");
-                    }
-                }
-                else { error("signedOut"); } // Handle error if user is not logged in
-            }
-
-            // Handle commands command
-            if ((input.substr(0, 8) == "commands" && input.length() == 8) || (input.substr(0, 4) == "cmds" && input.length() == 4))
-            {
-                    cout << "\n  List of available commands:\n";
-                    cout << "   - fetch\n   - quiz\n   - quit\n   - logout\n   - cmds\n   - settings\n   - points\n \n";
-            }
-
-            // Handle fetch command
-            if (loggedin == "yes")
-            {
-                if (input.substr(0, 5) == "fetch" && input.length() == 5)
-                {
-                    cout << "\n  List of prayers you can fetch:\n";
-                    cout << "   - fajr\n   - sunrise\n   - duhr\n   - asr\n   - maghrib\n   - isha\n \n";
-                }
-                else if (input.substr(0, 10) == "fetch fajr" && input.length() == 10)
-                {
-                    cout << "Fajr Time: " << prayerTimes.getFajrTime() << endl;
-                }
-                else if (input.substr(0, 13) == "fetch sunrise" && input.length() == 13)
-                {
-                    cout << "Sunrise Time: " << prayerTimes.getSunriseTime() << endl;
-                }
-                else if (input.substr(0, 10) == "fetch duhr" && input.length() == 10)
-                {
-                    cout << "Duhr Time: " << prayerTimes.getDuhrTime() << endl;
-                }
-                else if (input.substr(0, 9) == "fetch asr" && input.length() == 9)
-                {
-                    cout << "Asr Time: " << prayerTimes.getAsrTime() << endl;
-                }
-                else if (input.substr(0, 13) == "fetch maghrib" && input.length() == 13)
-                {
-                    cout << "Maghrib Time: " << prayerTimes.getMaghribTime() << endl;
-                }
-                else if (input.substr(0, 10) == "fetch isha" && input.length() == 10)
-                {
-                    cout << "Isha Time: " << prayerTimes.getIshaTime() << endl;
-                }
-            }
-            else
-            {
-                if (input.substr(0, 5) == "fetch")
-                    error("signedOut"); // Handle error if user is not logged in
-            }
-
-            // Handle logout command
-            if ((input.substr(0, 6) == "logout" && input.length() == 6) || (input.substr(0, 7) == "signout" && input.length() == 7))
-            {
-                if (loggedin == "yes")
-                {
-                    prefix = "";
-                    loggedin = "no";
-                    clear();
-                    welcome("successfulLogout"); // Print a logout message
-                }
-                else
-                {
-                    error("signedOut"); // Handle error if user is not logged in
-                }
-            }
-
-            // Handle quit command
-            if (loggedin == "no")
-            {
-                delete user;
-                user = nullptr;
-            }
-
-            // Handle quit command
-            if (input.length() <= 4) { input = decapitalize(input); }
-            if ((input.substr(0, 4) == "quit" && input.length() == 4) || (input[0] == '0' && input.length() == 1) || (input[0] == 'q' && input.length() == 1))
-            {
-                cout << "Exiting CLI mode." << endl; // Print a quit message
-                prefix = "";
-                loggedin = "no";
-                delete user;
-                user = nullptr;
-                break; // Exit the loop
-            }
-        }
-    }
-
-    // GUI CODE
-    if (mode[0] == '2')
-    {
-        // Enter GUI mode.
-        cout << "\n *** NOT OPERATIONAL AT THE MOMENT *** \n" << endl; // Print a message indicating GUI mode is not operational
-    }
-
-    return (0); // Return 0 to indicate successful execution
+    db.close();
+    return 0;
 }

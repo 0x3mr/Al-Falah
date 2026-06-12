@@ -1,0 +1,210 @@
+# ALFALAH APP
+
+ALFALAH APP is a modular Islamic companion application built in C++ that helps users track prayer times, manage locations, and access daily prayer-related functionality through a structured backend system powered by SQLite.
+
+The project focuses on clean architecture, scalability, and maintainable object-oriented design.
+
+---
+
+# Features
+
+* User management system
+* Prayer time tracking
+* Next prayer countdown
+* Location management
+* SQLite database integration
+* Modular C++ architecture
+* Makefile build system
+* Scalable backend structure
+* Git-based collaborative development workflow
+
+---
+
+# Technologies Used
+
+* C++
+* SQLite3
+* Makefile
+* Git & GitHub
+
+---
+
+# Project Structure
+
+```bash
+ALFALAH-APP/
+│
+├── src/
+│   ├── main.cpp
+│   ├── user.cpp
+│   ├── database.cpp
+│   ├── location.cpp
+│   ├── prayertime.cpp
+│   └── README.md
+│
+├── headers/
+│   ├── user.h
+│   ├── database.h
+│   ├── location.h
+│   ├── prayertime.h
+│   └── README.md
+│
+├── database/
+│   ├── schema.sql
+│   ├── alfalah.db
+│   └── README.md
+│
+├── docs/
+│   └── README.md
+│
+├── tests/
+│   └── README.md
+│
+├── Makefile
+├── .gitignore
+└── README.md
+```
+
+---
+
+# Core Modules
+
+## User Module
+
+Responsible for:
+
+* User creation
+* User information management
+* Storing last known location
+* Authentication-related functionality
+
+---
+
+## Database Module
+
+Handles:
+
+* SQLite database connection
+* Query execution
+* Database initialization
+* Data persistence
+
+---
+
+## Location Module
+
+Responsible for:
+
+* Saving user locations
+* Updating location information
+* Managing location history
+
+---
+
+## Prayer Time Module
+
+Handles:
+
+* Prayer time retrieval
+* Prayer schedule processing
+* Next prayer countdown calculations
+* Prayer time utilities
+
+---
+
+# Build Instructions
+
+Compile the project using:
+
+```bash
+make
+```
+
+Clean build files:
+
+```bash
+make clean
+```
+
+---
+
+# Running the Application
+
+After building the project:
+
+```bash
+./app
+```
+
+The executable name may vary depending on the Makefile configuration.
+
+---
+
+# Database
+
+The application uses SQLite for persistent data storage.
+
+Example tables:
+
+* users
+* locations
+* prayer_times
+
+Database scripts and initialization files are located inside the `database/` directory.
+
+---
+
+# Development Goals
+
+The project aims to provide:
+
+* Clean modular architecture
+* Maintainable codebase
+* Scalable backend system
+* Easy integration of future features
+
+---
+
+# Planned Features
+
+Future improvements may include:
+
+* Accurate prayer time calculations
+* Real-time location support
+* Islamic calendar integration
+* Qibla direction support
+* Notification system
+* Facial authentication
+* GUI/Desktop interface
+* Mobile integration
+* REST API backend
+
+---
+
+# Folder Documentation
+
+Each major folder contains its own `README.md` file explaining:
+
+* Folder purpose
+* Internal structure
+* Implementation details
+* Usage instructions
+
+---
+
+# Contributing
+
+Contributions are welcome.
+
+Please ensure:
+
+* Modular code structure
+* Clear documentation
+* Meaningful commits
+* Consistent coding style
+
+---
+
+# License
+
+This project is intended for educational and development purposes.
